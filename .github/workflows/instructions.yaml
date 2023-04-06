@@ -1,0 +1,19 @@
+name: Instructions
+on:
+  pull_request:
+    types: [opened]
+jobs:
+  comment:
+    name: Add instructions
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add instructions
+        uses: actions/github-script@v4
+        with:
+          script: |
+            github.issues.update({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: "To submit your solution, label this pull request with `Submitted` label.\n\nAfter submitting, your code will get built and linted and if some of these actions fail, the submission won't be accepted and you will need to fix the issues."
+            })

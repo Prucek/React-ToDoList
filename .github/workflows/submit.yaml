@@ -1,0 +1,68 @@
+name: Submission
+on:
+  pull_request:
+    types: [labeled]
+jobs:
+  submit:
+    name: Submit
+    if: ${{ github.event.label.name == 'Submitted' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install
+        run: npm install
+
+      - name: Lint
+        run: |
+          npm exec eslint "./src/**/*.{ts,tsx}"
+          npm exec prettier "./src/**/*.{ts,tsx}" --check
+
+      - name: Build
+        run: npm run build
+
+  success:
+    name: On submission successful
+    needs: submit
+    if: ${{ success() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Comment
+        uses: actions/github-script@v4
+        with:
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '@${{ github.actor }} Your task has been successfully submitted.'
+            })
+
+  failed:
+    name: On submission failed
+    needs: submit
+    if: ${{ failure() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Remove label
+        uses: actions/github-script@v4
+        with:
+          script: |
+            github.issues.removeLabel({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              name: 'Submitted'
+            })
+
+      - name: Comment
+        uses: actions/github-script@v4
+        with:
+          script: |
+            github.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '@${{ github.actor }} Your submission has failed. Please fix any failing steps of the Submit action and label the PR with `Submitted` label again.'
+            })
