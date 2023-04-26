@@ -1,11 +1,12 @@
 import {
 	AppBar,
+	Box,
+	Button,
 	Container,
 	CssBaseline,
 	ThemeProvider,
 	Toolbar
 } from '@mui/material';
-// import './App.css';
 import {
 	Outlet,
 	RootRoute,
@@ -14,7 +15,7 @@ import {
 	RouterProvider
 } from '@tanstack/react-router';
 
-import { ReactComponent as ReactLogo } from './assets/react.svg';
+import { signOut } from './firebase';
 import ButtonLink from './components/ButtonLink';
 import Home from './pages/Home';
 import About from './pages/About';
@@ -22,48 +23,50 @@ import Reviews from './pages/Reviews';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import theme from './theme';
+import useLoggedInUser, { UserProvider } from './hooks/useLoggedInUser';
 
 const rootRoute = new RootRoute({
-	component: () => (
-		// const user = useLoggedInUser();
-		// const t = useTranslation();
-		<ThemeProvider theme={theme}>
-			<CssBaseline />
+	component: () => {
+		const user = useLoggedInUser();
 
-			<AppBar sx={{ position: 'sticky' }}>
-				<Container maxWidth="sm">
-					<Toolbar disableGutters sx={{ gap: 2 }}>
-						<ButtonLink to="/">Home</ButtonLink>
-						<ButtonLink to="/about">About</ButtonLink>
-						<ButtonLink to="/reviews">Reviews</ButtonLink>
-						<ButtonLink to="/login">Login</ButtonLink>
-						{/* <Box sx={{ flexGrow: 1 }} />
-						{!user ? (
-							<ButtonLink to="/login">Login</ButtonLink>
-						) : (
-							<Button onClick={signOut}>Logout</Button>
-						)} */}
-					</Toolbar>
+		return (
+			<ThemeProvider theme={theme}>
+				<CssBaseline />
+
+				<AppBar sx={{ position: 'sticky' }}>
+					<Container maxWidth="sm">
+						<Toolbar disableGutters sx={{ gap: 2 }}>
+							<ButtonLink to="/">Home</ButtonLink>
+							<ButtonLink to="/about">About</ButtonLink>
+							<ButtonLink to="/reviews">Reviews</ButtonLink>
+							<Box sx={{ flexGrow: 1 }} />
+							{!user ? (
+								<ButtonLink to="/login">Login</ButtonLink>
+							) : (
+								<Button onClick={signOut}>Logout</Button>
+							)}
+						</Toolbar>
+					</Container>
+				</AppBar>
+
+				<Container
+					maxWidth="sm"
+					component="main"
+					sx={{
+						display: 'flex',
+						flexDirection: 'column',
+						justifyContent: 'center',
+						alignItems: 'center',
+						flexGrow: 1,
+						gap: 2,
+						my: 4
+					}}
+				>
+					<Outlet />
 				</Container>
-			</AppBar>
-
-			<Container
-				maxWidth="sm"
-				component="main"
-				sx={{
-					display: 'flex',
-					flexDirection: 'column',
-					justifyContent: 'center',
-					alignItems: 'center',
-					flexGrow: 1,
-					gap: 2,
-					my: 4
-				}}
-			>
-				<Outlet />
-			</Container>
-		</ThemeProvider>
-	)
+			</ThemeProvider>
+		);
+	}
 });
 
 const indexRoute = new Route({
@@ -113,6 +116,10 @@ declare module '@tanstack/react-router' {
 	}
 }
 
-const App = () => <RouterProvider router={router} />;
+const App = () => (
+	<UserProvider>
+		<RouterProvider router={router} />
+	</UserProvider>
+);
 
 export default App;
