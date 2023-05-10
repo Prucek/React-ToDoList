@@ -15,6 +15,8 @@ import {
 	getFirestore
 } from 'firebase/firestore';
 
+import { Status } from './components/TaskStatus';
+
 // Initialize Firebase
 initializeApp({
 	apiKey: 'AIzaSyAoMEI8fxKf4NMny8KsvLd6MA86PI7DMvA',
@@ -53,10 +55,29 @@ export type Review = {
 	description?: string;
 };
 
+// Tasks collection
+export type Task = {
+	email: string; // user email
+	name: string;
+	description?: string;
+	duration: number; // in minutes
+	deadline: Date;
+	color: string; // hex color
+	status: Status;
+};
+
 export const reviewsCollection = collection(
 	db,
 	'reviews'
 ) as CollectionReference<Review>;
 
+export const tasksCollection = collection(
+	db,
+	'tasks'
+) as CollectionReference<Task>;
+
 export const reviewsDocument = (id: string) =>
 	doc(db, 'reviews', id) as DocumentReference<Review>;
+
+export const tasksDocument = (id: string) =>
+	doc(db, 'tasks', id) as DocumentReference<Task>;
