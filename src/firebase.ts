@@ -12,7 +12,8 @@ import {
 	CollectionReference,
 	doc,
 	DocumentReference,
-	getFirestore
+	getFirestore,
+	Timestamp
 } from 'firebase/firestore';
 
 import { Status } from './components/TaskStatus';
@@ -61,7 +62,7 @@ export type Task = {
 	name: string;
 	description?: string;
 	duration: number; // in minutes
-	deadline: Date;
+	deadline: Timestamp;
 	color: string; // hex color
 	status: Status;
 };

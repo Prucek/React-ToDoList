@@ -1,5 +1,5 @@
 import { ReactNode, useState } from 'react';
-import { setDoc } from 'firebase/firestore';
+import { setDoc, Timestamp } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import {
 	Button,
@@ -53,7 +53,7 @@ const AddTask = ({ children }: Props) => {
 				name: name.value,
 				description: description.value,
 				duration,
-				deadline,
+				deadline: Timestamp.fromDate(deadline),
 				status: 'Planned',
 				color: color.value
 			});
