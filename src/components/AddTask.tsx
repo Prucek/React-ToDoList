@@ -11,6 +11,10 @@ import {
 	DialogActions,
 	DialogContent,
 	DialogTitle,
+	FormControl,
+	InputLabel,
+	MenuItem,
+	Select,
 	TextField,
 	Typography
 } from '@mui/material';
@@ -30,19 +34,25 @@ const AddTask = ({ children }: Props) => {
 	const [open, setOpen] = useState(false);
 
 	// Fields
-	const name = useField('name');
+	const name = useField('name', true);
 	const description = useField('description');
 	const [deadline, setDeadline] = useState<Dayjs | null>(dayjs());
 	const [duration, setDuration] = useState(10);
-	const [color, setColor] = useState('#000000');
+	const [unit, setUnit] = useState('mins');
+	const units = ['mins', 'hours', 'days'];
+	const [color, setColor] = useState('#FFFFFF');
 
 	const [submitError, setSubmitError] = useState<string>();
 
 	// Close and reset handler
 	const closeDialog = () => {
 		setOpen(false);
-		// setStars(0);
-		// description.props.onChange({ target: { value: '' } } as never);
+		name.props.onChange({ target: { value: '' } } as never);
+		description.props.onChange({ target: { value: '' } } as never);
+		setDeadline(dayjs());
+		setDuration(10);
+		setUnit('mins');
+		setColor('#FFFFFF');
 		setSubmitError(undefined);
 	};
 
@@ -52,12 +62,17 @@ const AddTask = ({ children }: Props) => {
 			setSubmitError('not_signed_in');
 			return;
 		}
+		if (!name.value) {
+			setSubmitError('name_required');
+			return;
+		}
 		try {
 			await setDoc(tasksDocument(uuidv4()), {
 				email: user.email,
 				name: name.value,
 				description: description.value,
-				duration,
+				duration:
+					duration * (unit === 'mins' ? 1 : unit === 'hours' ? 60 : 60 * 24),
 				deadline: Timestamp.fromDate(deadline ? deadline.toDate() : new Date()),
 				status: 'Planned',
 				color
@@ -70,6 +85,13 @@ const AddTask = ({ children }: Props) => {
 
 	const handleChangeComplete = (color: { hex: SetStateAction<string> }) => {
 		setColor(color.hex);
+	};
+
+	const handleNumberChange = (event: { target: { value: string } }) => {
+		const re = /^[0-9\b]+$/;
+		if (event.target.value === '' || re.test(event.target.value)) {
+			setDuration(+event.target.value);
+		}
 	};
 
 	return (
@@ -91,7 +113,49 @@ const AddTask = ({ children }: Props) => {
 						<DatePicker value={deadline} onChange={date => setDeadline(date)} />
 					</LocalizationProvider>
 
-					{/*TODO duration*/}
+					<div className="flex flex-row w-full">
+						<TextField
+							label="Duration"
+							sx={{
+								width: '75%'
+							}}
+							type="number"
+							value={duration}
+							onChange={handleNumberChange}
+						/>
+						<FormControl sx={{ width: '25%' }}>
+							<InputLabel id="unit-select-label">Unit</InputLabel>
+							<Select
+								labelId="unit-select-label"
+								id="unit-select"
+								value={unit}
+								defaultValue="mins"
+								label="Units"
+								onChange={event => {
+									setUnit(event.target.value);
+								}}
+								sx={{
+									fontSize: '1rem',
+									fontStyle: 'italic',
+									textTransform: 'capitalize'
+								}}
+							>
+								{units.map(_unit => (
+									<MenuItem
+										key={_unit}
+										value={_unit}
+										sx={{
+											fontSize: '1rem',
+											fontStyle: 'italic',
+											textTransform: 'capitalize'
+										}}
+									>
+										{_unit}
+									</MenuItem>
+								))}
+							</Select>
+						</FormControl>
+					</div>
 					<div className="colorPicker">
 						<CirclePicker
 							color={color}
