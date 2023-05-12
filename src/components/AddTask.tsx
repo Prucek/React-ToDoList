@@ -2,6 +2,9 @@ import { ReactNode, SetStateAction, useState } from 'react';
 import { setDoc, Timestamp } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { CirclePicker } from 'react-color';
+import { DatePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import {
 	Button,
 	Dialog,
@@ -11,6 +14,7 @@ import {
 	TextField,
 	Typography
 } from '@mui/material';
+import dayjs, { Dayjs } from 'dayjs';
 
 import useLoggedInUser from '../hooks/useLoggedInUser';
 import { tasksDocument } from '../firebase';
@@ -28,7 +32,7 @@ const AddTask = ({ children }: Props) => {
 	// Fields
 	const name = useField('name');
 	const description = useField('description');
-	const [deadline, setDeadline] = useState(new Date());
+	const [deadline, setDeadline] = useState<Dayjs | null>(dayjs());
 	const [duration, setDuration] = useState(10);
 	const [color, setColor] = useState('#000000');
 
@@ -54,7 +58,7 @@ const AddTask = ({ children }: Props) => {
 				name: name.value,
 				description: description.value,
 				duration,
-				deadline: Timestamp.fromDate(deadline),
+				deadline: Timestamp.fromDate(deadline ? deadline.toDate() : new Date()),
 				status: 'Planned',
 				color
 			});
@@ -81,9 +85,12 @@ const AddTask = ({ children }: Props) => {
 						minWidth: 500
 					}}
 				>
-					<TextField label="name" fullWidth {...name.props} />
-					<TextField label="description" fullWidth {...description.props} />
-					{/*TODO datepicker*/}
+					<TextField label="Name" fullWidth {...name.props} />
+					<TextField label="Description" fullWidth {...description.props} />
+					<LocalizationProvider dateAdapter={AdapterDayjs}>
+						<DatePicker value={deadline} onChange={date => setDeadline(date)} />
+					</LocalizationProvider>
+
 					{/*TODO duration*/}
 					<div className="colorPicker">
 						<CirclePicker
