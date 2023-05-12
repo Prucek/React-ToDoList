@@ -4,8 +4,14 @@ import {
 	Button,
 	Container,
 	CssBaseline,
+	FormControlLabel,
+	FormGroup,
+	PaletteMode,
+	Switch,
 	ThemeProvider,
-	Toolbar
+	Toolbar,
+	responsiveFontSizes,
+	createTheme
 } from '@mui/material';
 import {
 	Outlet,
@@ -14,6 +20,7 @@ import {
 	Router,
 	RouterProvider
 } from '@tanstack/react-router';
+import { useMemo, useState } from 'react';
 
 import { signOut } from './firebase';
 import ButtonLink from './components/ButtonLink';
@@ -22,15 +29,24 @@ import About from './pages/About';
 import Reviews from './pages/Reviews';
 import Login from './pages/Login';
 import NotFound from './pages/NotFound';
-import theme from './theme';
 import useLoggedInUser, { UserProvider } from './hooks/useLoggedInUser';
+import getPalleteValues from './theme/getPalleteOptions';
 
 const rootRoute = new RootRoute({
 	component: () => {
 		const user = useLoggedInUser();
 
+		const [mode, setMode] = useState<PaletteMode>('light');
+
+		const toggleColorMode = () => {
+			setMode(prevMode => (prevMode === 'light' ? 'dark' : 'light'));
+		};
+
+		// Update the theme only if the mode changes
+		const theme = useMemo(() => createTheme(getPalleteValues(mode)), [mode]);
+
 		return (
-			<ThemeProvider theme={theme}>
+			<ThemeProvider theme={responsiveFontSizes(theme)}>
 				<CssBaseline />
 
 				<AppBar sx={{ position: 'sticky' }}>
@@ -45,6 +61,13 @@ const rootRoute = new RootRoute({
 							) : (
 								<Button onClick={signOut}>Logout</Button>
 							)}
+							<div />
+							<FormGroup>
+								<FormControlLabel
+									control={<Switch onChange={toggleColorMode} />}
+									label="Darkmode"
+								/>
+							</FormGroup>
 						</Toolbar>
 					</Container>
 				</AppBar>
