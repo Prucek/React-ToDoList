@@ -58,6 +58,7 @@ export type Review = {
 
 // Tasks collection
 export type Task = {
+	id: string; // same as document id
 	email: string; // user email
 	name: string;
 	description?: string;

@@ -67,7 +67,9 @@ const AddTask = ({ children }: Props) => {
 			return;
 		}
 		try {
-			await setDoc(tasksDocument(uuidv4()), {
+			const id = uuidv4();
+			await setDoc(tasksDocument(id), {
+				id,
 				email: user.email,
 				name: name.value,
 				description: description.value,
