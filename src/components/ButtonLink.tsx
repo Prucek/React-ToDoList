@@ -5,7 +5,7 @@ type Props = ButtonProps & LinkPropsOptions;
 
 const ButtonLink = (props: Props) => (
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
-	<Button component={Link} {...(props as any)} />
+	<Button sx={{ color: '#ffffff' }} component={Link} {...(props as any)} />
 );
 
 export default ButtonLink;
