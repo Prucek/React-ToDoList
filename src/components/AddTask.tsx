@@ -1,6 +1,7 @@
-import { ReactNode, useState } from 'react';
+import { ReactNode, SetStateAction, useState } from 'react';
 import { setDoc, Timestamp } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
+import { CirclePicker } from 'react-color';
 import {
 	Button,
 	Dialog,
@@ -29,7 +30,7 @@ const AddTask = ({ children }: Props) => {
 	const description = useField('description');
 	const [deadline, setDeadline] = useState(new Date());
 	const [duration, setDuration] = useState(10);
-	const color = useField('color');
+	const [color, setColor] = useState('#000000');
 
 	const [submitError, setSubmitError] = useState<string>();
 
@@ -55,12 +56,16 @@ const AddTask = ({ children }: Props) => {
 				duration,
 				deadline: Timestamp.fromDate(deadline),
 				status: 'Planned',
-				color: color.value
+				color
 			});
 			closeDialog();
 		} catch (err) {
 			setSubmitError(err instanceof Error ? err.message : 'unknown_error');
 		}
+	};
+
+	const handleChangeComplete = (color: { hex: SetStateAction<string> }) => {
+		setColor(color.hex);
 	};
 
 	return (
@@ -80,7 +85,13 @@ const AddTask = ({ children }: Props) => {
 					<TextField label="description" fullWidth {...description.props} />
 					{/*TODO datepicker*/}
 					{/*TODO duration*/}
-					<TextField label="color" fullWidth {...color.props} />
+					<div className="colorPicker">
+						<CirclePicker
+							color={color}
+							onChange={handleChangeComplete}
+							onChangeComplete={handleChangeComplete}
+						/>
+					</div>
 				</DialogContent>
 				<DialogActions>
 					{submitError && (
