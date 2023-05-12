@@ -1,5 +1,5 @@
-import { ReactNode, SetStateAction, useState } from 'react';
-import { setDoc, Timestamp } from 'firebase/firestore';
+import { ReactNode, SetStateAction, useEffect, useState } from 'react';
+import { setDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { CirclePicker } from 'react-color';
 import { DatePicker } from '@mui/x-date-pickers';
@@ -19,36 +19,56 @@ import {
 	Typography
 } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
+import 'dayjs/locale/en-gb';
 
 import useLoggedInUser from '../hooks/useLoggedInUser';
-import { tasksDocument } from '../firebase';
-import useField from '../hooks/useField';
+import { Task, tasksDocument } from '../firebase';
 
 type Props = {
 	children: (open: () => void) => ReactNode;
+	task?: Task;
 };
 
-const AddTask = ({ children }: Props) => {
+const AddTask = ({ children, task }: Props) => {
 	const user = useLoggedInUser();
 	// Open state
 	const [open, setOpen] = useState(false);
 
 	// Fields
-	const name = useField('name', true);
-	const description = useField('description');
+	const [name, setName] = useState('');
+	const [description, setDescription] = useState('');
 	const [deadline, setDeadline] = useState<Dayjs | null>(dayjs());
 	const [duration, setDuration] = useState(10);
 	const [unit, setUnit] = useState('mins');
 	const units = ['mins', 'hours', 'days'];
 	const [color, setColor] = useState('#FFFFFF');
 
+	useEffect(() => {
+		if (task) {
+			setName(task.name);
+			setDescription(task.description !== undefined ? task.description : '');
+			setDeadline(dayjs(task.deadline.toDate()));
+			setDuration(
+				task.duration > 60 * 24
+					? task.duration / (60 * 24)
+					: task.duration > 60
+					? task.duration / 60
+					: task.duration
+			);
+			setUnit(
+				task.duration > 60 * 24 ? 'days' : task.duration > 60 ? 'hours' : 'mins'
+			);
+			setColor(task.color);
+		}
+	}, [task, open]);
+
 	const [submitError, setSubmitError] = useState<string>();
 
 	// Close and reset handler
 	const closeDialog = () => {
 		setOpen(false);
-		name.props.onChange({ target: { value: '' } } as never);
-		description.props.onChange({ target: { value: '' } } as never);
+		setName('');
+		setDescription('');
 		setDeadline(dayjs());
 		setDuration(10);
 		setUnit('mins');
@@ -62,23 +82,39 @@ const AddTask = ({ children }: Props) => {
 			setSubmitError('not_signed_in');
 			return;
 		}
-		if (!name.value) {
+		if (name === '') {
 			setSubmitError('name_required');
 			return;
 		}
 		try {
-			const id = uuidv4();
-			await setDoc(tasksDocument(id), {
-				id,
-				email: user.email,
-				name: name.value,
-				description: description.value,
-				duration:
-					duration * (unit === 'mins' ? 1 : unit === 'hours' ? 60 : 60 * 24),
-				deadline: Timestamp.fromDate(deadline ? deadline.toDate() : new Date()),
-				status: 'Planned',
-				color
-			});
+			if (task) {
+				await updateDoc(tasksDocument(task.id), {
+					name,
+					description,
+					duration:
+						duration * (unit === 'mins' ? 1 : unit === 'hours' ? 60 : 60 * 24),
+					deadline: Timestamp.fromDate(
+						deadline ? deadline.toDate() : new Date()
+					),
+					color
+				});
+			} else {
+				const id = uuidv4();
+				await setDoc(tasksDocument(id), {
+					id,
+					email: user.email,
+					name,
+					description,
+					duration:
+						duration * (unit === 'mins' ? 1 : unit === 'hours' ? 60 : 60 * 24),
+					deadline: Timestamp.fromDate(
+						deadline ? deadline.toDate() : new Date()
+					),
+					status: 'Planned',
+					color
+				});
+			}
+
 			closeDialog();
 		} catch (err) {
 			setSubmitError(err instanceof Error ? err.message : 'unknown_error');
@@ -100,7 +136,12 @@ const AddTask = ({ children }: Props) => {
 		<>
 			{children(() => setOpen(true))}
 			<Dialog open={open} onClose={closeDialog}>
-				<DialogTitle>Add task</DialogTitle>
+				{task ? (
+					<DialogTitle>Edit task</DialogTitle>
+				) : (
+					<DialogTitle>Add task</DialogTitle>
+				)}
+
 				<DialogContent
 					sx={{
 						display: 'flex',
@@ -109,9 +150,27 @@ const AddTask = ({ children }: Props) => {
 						minWidth: 500
 					}}
 				>
-					<TextField label="Name" fullWidth {...name.props} />
-					<TextField label="Description" fullWidth {...description.props} />
-					<LocalizationProvider dateAdapter={AdapterDayjs}>
+					<TextField
+						label="Name"
+						fullWidth
+						value={name}
+						required
+						onChange={event => {
+							setName(event.target.value);
+						}}
+					/>
+					<TextField
+						label="Description"
+						fullWidth
+						value={description}
+						onChange={event => {
+							setDescription(event.target.value);
+						}}
+					/>
+					<LocalizationProvider
+						dateAdapter={AdapterDayjs}
+						adapterLocale="en-gb"
+					>
 						<DatePicker value={deadline} onChange={date => setDeadline(date)} />
 					</LocalizationProvider>
 
