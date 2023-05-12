@@ -21,7 +21,6 @@ type Props = PropsWithChildren<{
 
 const TaskPreview: FC<Props> = ({ task, onClick }) => {
 	const [selected, setSelected] = useState(task.status);
-	console.log(task.deadline);
 
 	return (
 		<Grid item xs={2} sm={4} md={4} lg={4}>
