@@ -52,7 +52,7 @@ const Home = () => {
 					</TabList>
 				</Box>
 				<TabPanel value="1">
-					<TaskGrid tasks={tasks} />;
+					<TaskGrid tasks={tasks} />
 				</TabPanel>
 				<TabPanel value="2">
 					<CategoryGrid categories={categories} />
