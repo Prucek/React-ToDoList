@@ -5,6 +5,7 @@ import { Task } from '../firebase';
 
 import TaskPreview from './TaskPreview';
 import AddTask from './AddTask';
+import EditTask from './EditTask';
 
 type Props = {
 	tasks: Task[];
@@ -20,7 +21,9 @@ const TaskGrid: FC<Props> = ({ tasks }) => {
 			columns={{ xs: 4, sm: 8, md: 12, lg: 16 }}
 		>
 			{tasks.map((task, i) => (
-				<TaskPreview key={i} task={task} />
+				<EditTask key={i} task={task}>
+					{open => <TaskPreview key={i} task={task} onClick={open} />}
+				</EditTask>
 			))}
 			<Grid item xs={2} sm={4} md={4} lg={4}>
 				<AddTask>

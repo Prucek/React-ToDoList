@@ -7,8 +7,9 @@ import {
 	Select
 } from '@mui/material';
 import { FC, PropsWithChildren, useState } from 'react';
+import { updateDoc } from 'firebase/firestore';
 
-import { Task } from '../firebase';
+import { Task, tasksDocument } from '../firebase';
 import { ReactComponent as Calendar } from '../assets/calendar.svg';
 import { ReactComponent as Time } from '../assets/time.svg';
 
@@ -20,8 +21,11 @@ type Props = PropsWithChildren<{
 }>;
 
 const TaskPreview: FC<Props> = ({ task, onClick }) => {
-	const [selected, setSelected] = useState(task.status);
-	console.log(task.deadline);
+	const handleSubmit = async (event: { target: { value: string } }) => {
+		await updateDoc(tasksDocument(task.id), {
+			status: event.target.value as Status
+		});
+	};
 
 	return (
 		<Grid item xs={2} sm={4} md={4} lg={4}>
@@ -36,7 +40,6 @@ const TaskPreview: FC<Props> = ({ task, onClick }) => {
 					flexDirection: 'column',
 					flex: '1, 1, 0%'
 				}}
-				// className="Task"
 			>
 				<div className="flex items-center justify-between mb-2">
 					<span className="block font-medium dark:text-slate-200">
@@ -57,18 +60,25 @@ const TaskPreview: FC<Props> = ({ task, onClick }) => {
 				</time>
 				<p className="flex">
 					<Time className="mr-2 w-4 sm:w-5 h-min" />
-					{task.duration} min
+					{task.duration > 60 * 24
+						? task.duration / (60 * 24)
+						: task.duration > 60
+						? task.duration / 60
+						: task.duration}
+					{task.duration > 60 * 24
+						? ' Days'
+						: task.duration > 60
+						? ' Hours'
+						: ' Mins'}
 				</p>
 				<FormControl fullWidth>
 					<InputLabel id="status-select-label">Status</InputLabel>
 					<Select
 						labelId="status-select-label"
 						id="status-select"
-						value={selected}
+						value={task.status}
 						label="Status"
-						onChange={event => {
-							setSelected(event.target.value as Status);
-						}}
+						onChange={handleSubmit}
 						sx={{
 							fontSize: '1rem',
 							fontStyle: 'italic',
