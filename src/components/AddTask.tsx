@@ -1,5 +1,5 @@
 import { ReactNode, SetStateAction, useEffect, useState } from 'react';
-import { setDoc, Timestamp, updateDoc } from 'firebase/firestore';
+import { deleteDoc, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { CirclePicker } from 'react-color';
 import { DatePicker } from '@mui/x-date-pickers';
@@ -12,6 +12,7 @@ import {
 	DialogContent,
 	DialogTitle,
 	FormControl,
+	IconButton,
 	InputLabel,
 	MenuItem,
 	Select,
@@ -20,6 +21,7 @@ import {
 } from '@mui/material';
 import dayjs, { Dayjs } from 'dayjs';
 import 'dayjs/locale/en-gb';
+import { Delete } from '@mui/icons-material';
 
 import useLoggedInUser from '../hooks/useLoggedInUser';
 import { Task, tasksDocument } from '../firebase';
@@ -41,7 +43,7 @@ const AddTask = ({ children, task }: Props) => {
 	const [duration, setDuration] = useState(10);
 	const [unit, setUnit] = useState('mins');
 	const units = ['mins', 'hours', 'days'];
-	const [color, setColor] = useState('#FFFFFF');
+	const [color, setColor] = useState('#F44336');
 
 	useEffect(() => {
 		if (task) {
@@ -72,7 +74,7 @@ const AddTask = ({ children, task }: Props) => {
 		setDeadline(dayjs());
 		setDuration(10);
 		setUnit('mins');
-		setColor('#FFFFFF');
+		setColor('#F44336');
 		setSubmitError(undefined);
 	};
 
@@ -130,6 +132,16 @@ const AddTask = ({ children, task }: Props) => {
 		if (event.target.value === '' || re.test(event.target.value)) {
 			setDuration(+event.target.value);
 		}
+	};
+
+	const handleDeleteTask = async () => {
+		if (!user?.email) {
+			setSubmitError('not_signed_in');
+			return;
+		}
+
+		task && (await deleteDoc(tasksDocument(task.id)));
+		closeDialog();
 	};
 
 	return (
@@ -243,6 +255,11 @@ const AddTask = ({ children, task }: Props) => {
 					<Button onClick={handleSubmit} variant="contained">
 						Submit
 					</Button>
+					{task && (
+						<IconButton color="error" title="Delete" onClick={handleDeleteTask}>
+							<Delete />
+						</IconButton>
+					)}
 				</DialogActions>
 			</Dialog>
 		</>
