@@ -94,6 +94,7 @@ const AddCategory = ({ children, category }: Props) => {
 				const id = uuidv4();
 				await setDoc(categoriesDocument(id), {
 					id,
+					email: user.email,
 					name,
 					duration:
 						duration * (unit === 'mins' ? 1 : unit === 'hours' ? 60 : 60 * 24),
