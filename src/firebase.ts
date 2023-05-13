@@ -68,6 +68,14 @@ export type Task = {
 	status: Status;
 };
 
+// Categories collection
+export type Category = {
+	id: string; // same as document id
+	name: string;
+	duration: number; // in minutes
+	color: string; // hex color
+};
+
 export const reviewsCollection = collection(
 	db,
 	'reviews'
@@ -78,8 +86,16 @@ export const tasksCollection = collection(
 	'tasks'
 ) as CollectionReference<Task>;
 
+export const categoriesCollection = collection(
+	db,
+	'categories'
+) as CollectionReference<Category>;
+
 export const reviewsDocument = (id: string) =>
 	doc(db, 'reviews', id) as DocumentReference<Review>;
 
 export const tasksDocument = (id: string) =>
 	doc(db, 'tasks', id) as DocumentReference<Task>;
+
+export const categoriesDocument = (id: string) =>
+	doc(db, 'categories', id) as DocumentReference<Category>;
