@@ -1,5 +1,11 @@
 import { ReactNode, SetStateAction, useEffect, useState } from 'react';
-import { deleteDoc, setDoc, Timestamp, updateDoc } from 'firebase/firestore';
+import {
+	deleteDoc,
+	onSnapshot,
+	setDoc,
+	Timestamp,
+	updateDoc
+} from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { CirclePicker } from 'react-color';
 import { DatePicker } from '@mui/x-date-pickers';
@@ -24,7 +30,12 @@ import 'dayjs/locale/en-gb';
 import { Delete } from '@mui/icons-material';
 
 import useLoggedInUser from '../hooks/useLoggedInUser';
-import { Task, tasksDocument } from '../firebase';
+import {
+	Category,
+	Task,
+	categoriesCollection,
+	tasksDocument
+} from '../firebase';
 
 type Props = {
 	children: (open: () => void) => ReactNode;
@@ -44,6 +55,10 @@ const AddTask = ({ children, task }: Props) => {
 	const [unit, setUnit] = useState('mins');
 	const units = ['mins', 'hours', 'days'];
 	const [color, setColor] = useState('#F44336');
+	const [category, setCategory] = useState('');
+
+	// user categories
+	const [userCategories, setUserCategories] = useState<Category[]>([]);
 
 	useEffect(() => {
 		if (task) {
@@ -61,8 +76,17 @@ const AddTask = ({ children, task }: Props) => {
 				task.duration > 60 * 24 ? 'days' : task.duration > 60 ? 'hours' : 'mins'
 			);
 			setColor(task.color);
+			setCategory(task.category);
 		}
 	}, [task, open]);
+
+	useEffect(
+		() =>
+			onSnapshot(categoriesCollection, snapshot => {
+				setUserCategories(snapshot.docs.map(doc => doc.data()));
+			}),
+		[]
+	);
 
 	const [submitError, setSubmitError] = useState<string>();
 
@@ -75,6 +99,7 @@ const AddTask = ({ children, task }: Props) => {
 		setDuration(10);
 		setUnit('mins');
 		setColor('#F44336');
+		setCategory('');
 		setSubmitError(undefined);
 	};
 
@@ -98,7 +123,8 @@ const AddTask = ({ children, task }: Props) => {
 					deadline: Timestamp.fromDate(
 						deadline ? deadline.toDate() : new Date()
 					),
-					color
+					color,
+					category
 				});
 			} else {
 				const id = uuidv4();
@@ -113,7 +139,8 @@ const AddTask = ({ children, task }: Props) => {
 						deadline ? deadline.toDate() : new Date()
 					),
 					status: 'Planned',
-					color
+					color,
+					category
 				});
 			}
 
@@ -132,6 +159,36 @@ const AddTask = ({ children, task }: Props) => {
 		if (event.target.value === '' || re.test(event.target.value)) {
 			setDuration(+event.target.value);
 		}
+	};
+
+	const handleCategoryChange = (event: { target: { value: string } }) => {
+		const newCategoryName = event.target.value;
+		setCategory(newCategoryName);
+
+		// set task duration and color according to selected category
+		userCategories.forEach(userCategory => {
+			if (
+				(userCategory.email === user?.email ||
+					userCategory.email === 'build_in_category') &&
+				userCategory.name === newCategoryName
+			) {
+				setDuration(
+					userCategory.duration > 60 * 24
+						? userCategory.duration / (60 * 24)
+						: userCategory.duration > 60
+						? userCategory.duration / 60
+						: userCategory.duration
+				);
+				setUnit(
+					userCategory.duration > 60 * 24
+						? 'days'
+						: userCategory.duration > 60
+						? 'hours'
+						: 'mins'
+				);
+				setColor(userCategory.color);
+			}
+		});
 	};
 
 	const handleDeleteTask = async () => {
@@ -179,6 +236,45 @@ const AddTask = ({ children, task }: Props) => {
 							setDescription(event.target.value);
 						}}
 					/>
+
+					<FormControl fullWidth>
+						<InputLabel id="category-select-label">Category</InputLabel>
+						<Select
+							labelId="category-select-label"
+							id="category-select"
+							value={category}
+							label="Category"
+							onChange={handleCategoryChange}
+							sx={{
+								fontSize: '1rem',
+								fontStyle: 'italic',
+								textTransform: 'capitalize'
+							}}
+						>
+							{userCategories.map(userCategory => {
+								// shows only categories created by login user and build_in categories school, work, shopping
+								if (
+									userCategory.email === user?.email ||
+									userCategory.email === 'build_in_category'
+								) {
+									return (
+										<MenuItem
+											key={userCategory.id}
+											value={userCategory.name}
+											sx={{
+												fontSize: '1rem',
+												fontStyle: 'italic',
+												textTransform: 'capitalize'
+											}}
+										>
+											{userCategory.name}
+										</MenuItem>
+									);
+								}
+							})}
+						</Select>
+					</FormControl>
+
 					<LocalizationProvider
 						dateAdapter={AdapterDayjs}
 						adapterLocale="en-gb"
