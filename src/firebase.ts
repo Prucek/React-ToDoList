@@ -66,11 +66,13 @@ export type Task = {
 	deadline: Timestamp;
 	color: string; // hex color
 	status: Status;
+	category: string; // category name
 };
 
 // Categories collection
 export type Category = {
 	id: string; // same as document id
+	email: string; // user email
 	name: string;
 	duration: number; // in minutes
 	color: string; // hex color
