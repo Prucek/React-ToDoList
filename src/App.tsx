@@ -59,7 +59,9 @@ const rootRoute = new RootRoute({
 							{!user ? (
 								<ButtonLink to="/login">Login</ButtonLink>
 							) : (
-								<Button onClick={signOut}>Logout</Button>
+								<Button onClick={signOut} sx={{ color: '#ffffff' }}>
+									Logout
+								</Button>
 							)}
 							<div />
 							<FormGroup>
