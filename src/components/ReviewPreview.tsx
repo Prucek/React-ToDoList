@@ -7,12 +7,18 @@ import {
 	IconButton,
 	Typography
 } from '@mui/material';
+import { deleteDoc } from '@firebase/firestore';
 
-import { Review } from '../firebase';
+import { Review, reviewsDocument } from '../firebase';
 import useLoggedInUser from '../hooks/useLoggedInUser';
 
 const ReviewPreview = ({ by, stars, description }: Review) => {
 	const user = useLoggedInUser();
+
+	const handleDeleteReview = async () => {
+		await deleteDoc(reviewsDocument(by));
+	};
+
 	return (
 		<Card
 			sx={{
@@ -40,7 +46,7 @@ const ReviewPreview = ({ by, stars, description }: Review) => {
 			</CardContent>
 			{user?.email === by && (
 				<CardActions>
-					<IconButton color="error" title="Delete">
+					<IconButton color="error" title="Delete" onClick={handleDeleteReview}>
 						<Delete />
 					</IconButton>
 				</CardActions>
