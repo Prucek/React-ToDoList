@@ -13,6 +13,7 @@ import {
 } from '../firebase';
 import TaskGrid from '../components/TaskGrid';
 import CategoryGrid from '../components/CategoryGrid';
+import { Search } from '../components/Search';
 
 const Home = () => {
 	usePageTitle('Home');
@@ -20,6 +21,7 @@ const Home = () => {
 	const [tabValue, setTabValue] = useState('1');
 	const [tasks, setTasks] = useState<Task[]>([]);
 	const [categories, setCategories] = useState<Category[]>([]);
+	const [inputValue, setInputValue] = useState('');
 	const user = useLoggedInUser();
 
 	useEffect(
@@ -51,11 +53,24 @@ const Home = () => {
 						<Tab label="Categories" value="2" />
 					</TabList>
 				</Box>
+				<Search
+					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+						setInputValue(e.target.value);
+					}}
+				/>
 				<TabPanel value="1">
-					<TaskGrid tasks={tasks} />
+					<TaskGrid
+						tasks={tasks.filter(el =>
+							el.name.toLowerCase().includes(inputValue.toLowerCase())
+						)}
+					/>
 				</TabPanel>
 				<TabPanel value="2">
-					<CategoryGrid categories={categories} />
+					<CategoryGrid
+						categories={categories.filter(el =>
+							el.name.toLowerCase().includes(inputValue.toLowerCase())
+						)}
+					/>
 				</TabPanel>
 			</TabContext>
 		</Box>
