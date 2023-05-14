@@ -30,7 +30,7 @@ const Login = () => {
 					navigate({ to: '/' });
 				} catch (err) {
 					setSubmitError(
-						(err as { message?: string })?.message ?? 'unknown_error'
+						(err as { message?: string })?.message ?? 'Unknown error occurred'
 					);
 				}
 			}}
@@ -70,14 +70,14 @@ const Login = () => {
 					variant="outlined"
 					onClick={() => setSignUp(true)}
 				>
-					sign_up
+					SIGN UP
 				</Button>
 				<Button
 					type="submit"
 					variant="contained"
 					onClick={() => setSignUp(false)}
 				>
-					sign_in
+					SIGN IN
 				</Button>
 			</Box>
 		</Paper>

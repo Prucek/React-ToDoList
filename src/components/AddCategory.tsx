@@ -75,11 +75,11 @@ const AddCategory = ({ children, category }: Props) => {
 	// Submit handler
 	const handleSubmit = async () => {
 		if (!user?.email) {
-			setSubmitError('not_signed_in');
+			setSubmitError('Sign in first to create category');
 			return;
 		}
 		if (name === '') {
-			setSubmitError('name_required');
+			setSubmitError('Name of category is required');
 			return;
 		}
 		try {
@@ -104,7 +104,9 @@ const AddCategory = ({ children, category }: Props) => {
 
 			closeDialog();
 		} catch (err) {
-			setSubmitError(err instanceof Error ? err.message : 'unknown_error');
+			setSubmitError(
+				err instanceof Error ? err.message : 'Unknown error occurred'
+			);
 		}
 	};
 
@@ -121,7 +123,7 @@ const AddCategory = ({ children, category }: Props) => {
 
 	const handleDeleteCategory = async () => {
 		if (!user?.email) {
-			setSubmitError('not_signed_in');
+			setSubmitError('Sign in to delete this category');
 			return;
 		}
 

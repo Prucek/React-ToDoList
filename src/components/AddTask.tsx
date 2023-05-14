@@ -106,11 +106,11 @@ const AddTask = ({ children, task }: Props) => {
 	// Submit handler
 	const handleSubmit = async () => {
 		if (!user?.email) {
-			setSubmitError('not_signed_in');
+			setSubmitError('Sign in first to create task');
 			return;
 		}
 		if (name === '') {
-			setSubmitError('name_required');
+			setSubmitError('Name of task is required');
 			return;
 		}
 		try {
@@ -146,7 +146,9 @@ const AddTask = ({ children, task }: Props) => {
 
 			closeDialog();
 		} catch (err) {
-			setSubmitError(err instanceof Error ? err.message : 'unknown_error');
+			setSubmitError(
+				err instanceof Error ? err.message : 'Unknown error occurred'
+			);
 		}
 	};
 
@@ -192,11 +194,6 @@ const AddTask = ({ children, task }: Props) => {
 	};
 
 	const handleDeleteTask = async () => {
-		if (!user?.email) {
-			setSubmitError('not_signed_in');
-			return;
-		}
-
 		task && (await deleteDoc(tasksDocument(task.id)));
 		closeDialog();
 	};

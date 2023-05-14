@@ -44,7 +44,7 @@ const AddReview = ({ children }: Props) => {
 	// Submit handler
 	const handleSubmit = async () => {
 		if (!user?.email) {
-			setSubmitError('not_signed_in');
+			setSubmitError('Sign in first to make review');
 			return;
 		}
 		try {
@@ -55,7 +55,9 @@ const AddReview = ({ children }: Props) => {
 			});
 			closeDialog();
 		} catch (err) {
-			setSubmitError(err instanceof Error ? err.message : 'unknown_error');
+			setSubmitError(
+				err instanceof Error ? err.message : 'Unknown error occurred'
+			);
 		}
 	};
 
