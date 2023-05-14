@@ -50,7 +50,7 @@ const rootRoute = new RootRoute({
 				<CssBaseline />
 
 				<AppBar sx={{ position: 'sticky' }}>
-					<Container maxWidth="sm">
+					<Container maxWidth="lg">
 						<Toolbar disableGutters sx={{ gap: 2 }}>
 							<ButtonLink to="/">Home</ButtonLink>
 							<ButtonLink to="/about">About</ButtonLink>
