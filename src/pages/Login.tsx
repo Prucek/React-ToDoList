@@ -7,7 +7,7 @@ import useField from '../hooks/useField';
 import { signIn, signUp } from '../firebase';
 
 const Login = () => {
-	usePageTitle('login');
+	usePageTitle('Login');
 
 	const navigate = useNavigate();
 

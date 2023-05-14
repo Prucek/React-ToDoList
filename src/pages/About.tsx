@@ -3,7 +3,7 @@ import { Typography } from '@mui/material';
 import usePageTitle from '../hooks/usePageTitle';
 
 const About = () => {
-	usePageTitle('about');
+	usePageTitle('About');
 	return (
 		<>
 			<Typography variant="h2">TODO APP</Typography>

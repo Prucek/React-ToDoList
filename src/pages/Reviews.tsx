@@ -9,7 +9,7 @@ import useLoggedInUser from '../hooks/useLoggedInUser';
 import usePageTitle from '../hooks/usePageTitle';
 
 const Reviews: FC = () => {
-	usePageTitle('reviews');
+	usePageTitle('Reviews');
 
 	const [reviews, setReviews] = useState<Review[]>([]);
 	const user = useLoggedInUser();
