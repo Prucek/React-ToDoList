@@ -79,6 +79,7 @@ const TaskPreview: FC<Props> = ({ task, onClick }) => {
 						value={task.status}
 						label="Status"
 						onChange={handleSubmit}
+						onClick={event => event.stopPropagation()}
 						sx={{
 							fontSize: '1rem',
 							fontStyle: 'italic',
