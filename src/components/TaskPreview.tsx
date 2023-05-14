@@ -14,6 +14,7 @@ import { ReactComponent as Calendar } from '../assets/calendar.svg';
 import { ReactComponent as Time } from '../assets/time.svg';
 
 import { Status, statuses } from './TaskStatus';
+import CalculateDuration from './CalculateDuration';
 
 type Props = PropsWithChildren<{
 	task: Task;
@@ -26,6 +27,7 @@ const TaskPreview: FC<Props> = ({ task, onClick }) => {
 			status: event.target.value as Status
 		});
 	};
+	const { calcDuration, calcUnit } = CalculateDuration(task.duration, true);
 
 	return (
 		<Grid item xs={2} sm={4} md={4} lg={4}>
@@ -61,16 +63,8 @@ const TaskPreview: FC<Props> = ({ task, onClick }) => {
 				</time>
 				<p className="flex">
 					<Time className="mr-2 w-4 sm:w-5 h-min" />
-					{task.duration > 60 * 24
-						? task.duration / (60 * 24)
-						: task.duration > 60
-						? task.duration / 60
-						: task.duration}
-					{task.duration > 60 * 24
-						? ' Days'
-						: task.duration > 60
-						? ' Hours'
-						: ' Mins'}
+					{calcDuration}
+					{calcUnit}
 				</p>
 				<FormControl fullWidth>
 					<InputLabel id="status-select-label">Status</InputLabel>

@@ -22,6 +22,8 @@ import { Delete } from '@mui/icons-material';
 import useLoggedInUser from '../hooks/useLoggedInUser';
 import { Category, categoriesDocument } from '../firebase';
 
+import CalculateDuration from './CalculateDuration';
+
 type Props = {
 	children: (open: () => void) => ReactNode;
 	category?: Category;
@@ -42,20 +44,9 @@ const AddCategory = ({ children, category }: Props) => {
 	useEffect(() => {
 		if (category) {
 			setName(category.name);
-			setDuration(
-				category.duration > 60 * 24
-					? category.duration / (60 * 24)
-					: category.duration > 60
-					? category.duration / 60
-					: category.duration
-			);
-			setUnit(
-				category.duration > 60 * 24
-					? 'days'
-					: category.duration > 60
-					? 'hours'
-					: 'mins'
-			);
+			const { calcDuration, calcUnit } = CalculateDuration(category.duration);
+			setDuration(calcDuration);
+			setUnit(calcUnit);
 			setColor(category.color);
 		}
 	}, [category, open]);

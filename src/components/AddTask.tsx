@@ -37,6 +37,8 @@ import {
 	tasksDocument
 } from '../firebase';
 
+import CalculateDuration from './CalculateDuration';
+
 type Props = {
 	children: (open: () => void) => ReactNode;
 	task?: Task;
@@ -56,7 +58,6 @@ const AddTask = ({ children, task }: Props) => {
 	const units = ['mins', 'hours', 'days'];
 	const [color, setColor] = useState('#F44336');
 	const [category, setCategory] = useState('');
-
 	// user categories
 	const [userCategories, setUserCategories] = useState<Category[]>([]);
 
@@ -65,16 +66,9 @@ const AddTask = ({ children, task }: Props) => {
 			setName(task.name);
 			setDescription(task.description !== undefined ? task.description : '');
 			setDeadline(dayjs(task.deadline.toDate()));
-			setDuration(
-				task.duration > 60 * 24
-					? task.duration / (60 * 24)
-					: task.duration > 60
-					? task.duration / 60
-					: task.duration
-			);
-			setUnit(
-				task.duration > 60 * 24 ? 'days' : task.duration > 60 ? 'hours' : 'mins'
-			);
+			const { calcDuration, calcUnit } = CalculateDuration(task.duration);
+			setDuration(calcDuration);
+			setUnit(calcUnit);
 			setColor(task.color);
 			setCategory(task.category);
 		}
@@ -174,20 +168,11 @@ const AddTask = ({ children, task }: Props) => {
 					userCategory.email === 'build_in_category') &&
 				userCategory.name === newCategoryName
 			) {
-				setDuration(
-					userCategory.duration > 60 * 24
-						? userCategory.duration / (60 * 24)
-						: userCategory.duration > 60
-						? userCategory.duration / 60
-						: userCategory.duration
+				const { calcDuration, calcUnit } = CalculateDuration(
+					userCategory.duration
 				);
-				setUnit(
-					userCategory.duration > 60 * 24
-						? 'days'
-						: userCategory.duration > 60
-						? 'hours'
-						: 'mins'
-				);
+				setDuration(calcDuration);
+				setUnit(calcUnit);
 				setColor(userCategory.color);
 			}
 		});
