@@ -6,7 +6,7 @@ import {
 	MenuItem,
 	Select
 } from '@mui/material';
-import { FC, PropsWithChildren, useState } from 'react';
+import { FC, PropsWithChildren } from 'react';
 import { updateDoc } from 'firebase/firestore';
 
 import { Task, tasksDocument } from '../firebase';
@@ -49,13 +49,14 @@ const TaskPreview: FC<Props> = ({ task, onClick }) => {
 				<p
 					title={task.description}
 					className="description mb-2 text-slate-500 dark:text-slate-500 line-clamp-3"
+					style={{ visibility: task.description !== '' ? 'visible' : 'hidden' }}
 				>
-					{task.description}
+					{task.description !== '' ? task.description : 'empty'}
 				</p>
 				<time className="p-3 sm:p-4 flex text-left">
 					<Calendar className="mr-2 w-4 sm:w-5 h-min" />{' '}
 					{task.deadline.toDate().getDate().toString().padStart(2, '0')}/
-					{task.deadline.toDate().getMonth().toString().padStart(2, '0')}/
+					{(task.deadline.toDate().getMonth() + 1).toString().padStart(2, '0')}/
 					{task.deadline.toDate().getFullYear()}
 				</time>
 				<p className="flex">
