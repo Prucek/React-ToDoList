@@ -1,13 +1,24 @@
+import { TextField } from '@mui/material';
+
+import { ReactComponent as SearchIcon } from '../assets/search.svg';
+
 export const Search = ({
 	onChange
 }: {
 	onChange: React.ChangeEventHandler;
 }) => (
-	<input
+	<TextField
+		label="Search"
 		className="w-full px-4 py-2 text-gray-700 rounded border-2 focus:outline-none
-         focus:ring-2 focus:ring-purple-800 mt-2 dark:bg-slate-950"
+         focus:ring-2 focus:ring-purple-800 mt-4 input flex-1"
 		type="text"
 		onChange={onChange}
-		placeholder="Search by the title ..."
+		placeholder="Search by name ..."
+		sx={{
+			marginTop: '1rem'
+		}}
+		InputProps={{
+			startAdornment: <SearchIcon className="mr-2 w-10 h-min p-2" />
+		}}
 	/>
 );
