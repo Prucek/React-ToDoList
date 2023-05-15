@@ -164,8 +164,7 @@ const AddTask = ({ children, task }: Props) => {
 		// set task duration and color according to selected category
 		userCategories.forEach(userCategory => {
 			if (
-				(userCategory.email === user?.email ||
-					userCategory.email === 'build_in_category') &&
+				userCategory.email === user?.email &&
 				userCategory.name === newCategoryName
 			) {
 				const { calcDuration, calcUnit } = CalculateDuration(
@@ -234,11 +233,8 @@ const AddTask = ({ children, task }: Props) => {
 							}}
 						>
 							{userCategories.map(userCategory => {
-								// shows only categories created by login user and build_in categories school, work, shopping
-								if (
-									userCategory.email === user?.email ||
-									userCategory.email === 'build_in_category'
-								) {
+								// shows only categories of login user
+								if (userCategory.email === user?.email) {
 									return (
 										<MenuItem
 											key={userCategory.id}
