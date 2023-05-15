@@ -22,11 +22,8 @@ const CategoryGrid: FC<Props> = ({ categories }) => {
 			columns={{ xs: 4, sm: 8, md: 12, lg: 16 }}
 		>
 			{categories.map((category, i) => {
-				// show only categories of login user and default one
-				if (
-					category.email === user?.email ||
-					category.email === 'build_in_category'
-				) {
+				// show only categories of login user
+				if (category.email === user?.email) {
 					return (
 						<EditCategory key={i} category={category}>
 							{open => (

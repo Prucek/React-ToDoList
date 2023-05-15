@@ -1,10 +1,12 @@
 import { useNavigate } from '@tanstack/react-router';
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { Box, Button, Paper, TextField, Typography } from '@mui/material';
+import { setDoc } from 'firebase/firestore';
+import { v4 as uuidv4 } from 'uuid';
 
 import usePageTitle from '../hooks/usePageTitle';
 import useField from '../hooks/useField';
-import { signIn, signUp } from '../firebase';
+import { categoriesDocument, signIn, signUp } from '../firebase';
 
 const Login = () => {
 	usePageTitle('login');
@@ -17,6 +19,30 @@ const Login = () => {
 	const password = useField('password', true);
 
 	const [submitError, setSubmitError] = useState<string>();
+
+	const defaultCategoryDict: {
+		[categoryName: string]: { duration: number; color: string };
+	} = {};
+
+	defaultCategoryDict.School = { duration: 600, color: '#f44336' };
+	defaultCategoryDict.Work = { duration: 480, color: '#ffeb3b' };
+	defaultCategoryDict.Shopping = { duration: 30, color: '#4caf50' };
+
+	useEffect(() => {
+		if (isSignUp) {
+			// add default categories school, work, shopping to newly registerred user
+			Object.entries(defaultCategoryDict).forEach(async ([key, value]) => {
+				const id = uuidv4();
+				await setDoc(categoriesDocument(id), {
+					id,
+					email: email.value,
+					name: key,
+					duration: value.duration,
+					color: value.color
+				});
+			});
+		}
+	}, [isSignUp]);
 
 	return (
 		<Paper

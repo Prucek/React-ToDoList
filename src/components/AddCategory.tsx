@@ -122,11 +122,6 @@ const AddCategory = ({ children, category }: Props) => {
 	};
 
 	const handleDeleteCategory = async () => {
-		if (!user?.email) {
-			setSubmitError('Sign in to delete this category');
-			return;
-		}
-
 		category && (await deleteDoc(categoriesDocument(category.id)));
 		closeDialog();
 	};
