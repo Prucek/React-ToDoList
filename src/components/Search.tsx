@@ -3,8 +3,10 @@ import { TextField } from '@mui/material';
 import { ReactComponent as SearchIcon } from '../assets/search.svg';
 
 export const Search = ({
+	value,
 	onChange
 }: {
+	value: string;
 	onChange: React.ChangeEventHandler;
 }) => (
 	<TextField
@@ -14,11 +16,9 @@ export const Search = ({
 		type="text"
 		onChange={onChange}
 		placeholder="Search by name ..."
-		sx={{
-			marginTop: '1rem'
-		}}
 		InputProps={{
 			startAdornment: <SearchIcon className="mr-2 w-10 h-min p-2" />
 		}}
+		value={value}
 	/>
 );

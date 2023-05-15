@@ -1,8 +1,13 @@
 import { useEffect, useState } from 'react';
 import { onSnapshot } from 'firebase/firestore';
-import { Box, Tab } from '@mui/material';
+import { Box, Button, Tab } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
+import { DatePicker } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { Dayjs } from 'dayjs';
 
+import { ReactComponent as FilterIcon } from '../assets/filter.svg';
 import useLoggedInUser from '../hooks/useLoggedInUser';
 import usePageTitle from '../hooks/usePageTitle';
 import {
@@ -16,6 +21,7 @@ import CategoryGrid from '../components/CategoryGrid';
 import { Search } from '../components/Search';
 import { statuses } from '../components/TaskStatus';
 import StatusFilter from '../components/StatusFilter';
+import 'dayjs/locale/en-gb';
 
 const Home = () => {
 	usePageTitle('Home');
@@ -25,7 +31,12 @@ const Home = () => {
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [inputValue, setInputValue] = useState('');
 	const [activeFilter, setActiveFilter] = useState('');
+	const [fromFilter, setFromFilter] = useState<Dayjs | null>(null);
+	const [toFilter, setToFilter] = useState<Dayjs | null>(null);
+	const [isFilter, setIsFilter] = useState(false);
 	const user = useLoggedInUser();
+
+	console.log('filter: ', toFilter?.toDate());
 
 	useEffect(
 		() =>
@@ -63,6 +74,7 @@ const Home = () => {
 							title={status}
 							isActive={status === activeFilter}
 							onClick={(e: React.MouseEvent) => {
+								setIsFilter(prev => !prev);
 								const el = e.target as HTMLElement;
 								el.textContent === activeFilter
 									? setActiveFilter('')
@@ -70,18 +82,82 @@ const Home = () => {
 							}}
 						/>
 					))}
-				<Search
-					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-						setInputValue(e.target.value);
-					}}
-				/>
+				<div className="flex mt-6">
+					<Search
+						value={inputValue}
+						onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+							setIsFilter(true);
+							if (e.target.value === '') {
+								setIsFilter(false);
+							}
+							setInputValue(e.target.value);
+						}}
+					/>
+					{tabValue === '1' && (
+						<div>
+							<LocalizationProvider
+								dateAdapter={AdapterDayjs}
+								adapterLocale="en-gb"
+							>
+								<DatePicker
+									label="From"
+									value={fromFilter}
+									onChange={date => {
+										setFromFilter(date);
+										setIsFilter(true);
+									}}
+								/>
+							</LocalizationProvider>
+							<LocalizationProvider
+								dateAdapter={AdapterDayjs}
+								adapterLocale="en-gb"
+							>
+								<DatePicker
+									label="To"
+									value={toFilter}
+									onChange={date => {
+										setToFilter(date);
+										setIsFilter(true);
+									}}
+								/>
+							</LocalizationProvider>
+						</div>
+					)}
+
+					<Button
+						sx={{ bgcolor: isFilter ? '#8c1aff' : '' }}
+						disabled={!isFilter}
+						onClick={e => {
+							setActiveFilter('');
+							setFromFilter(null);
+							setToFilter(null);
+							setInputValue('');
+							setIsFilter(false);
+						}}
+					>
+						<FilterIcon className="w-4 sm:w-5 h-min" />
+					</Button>
+				</div>
+
 				<TabPanel value="1">
 					<TaskGrid
 						tasks={tasks
 							.filter(el =>
 								el.name.toLowerCase().includes(inputValue.toLowerCase())
 							)
-							.filter(e => e.status.includes(activeFilter))}
+							.filter(e => e.status.includes(activeFilter))
+							.filter(
+								e =>
+									e.deadline.toDate() >=
+									(fromFilter === null
+										? e.deadline.toDate()
+										: fromFilter.toDate())
+							)
+							.filter(
+								e =>
+									e.deadline.toDate() <=
+									(toFilter === null ? e.deadline.toDate() : toFilter.toDate())
+							)}
 					/>
 				</TabPanel>
 				<TabPanel value="2">
