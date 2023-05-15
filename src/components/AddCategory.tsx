@@ -200,19 +200,6 @@ const AddCategory = ({ children, category }: Props) => {
 					{submitError && (
 						<Typography
 							variant="subtitle2"
-							align="right"
-							color="error"
-							paragraph
-							sx={{ mb: 0, mr: 2 }}
-						>
-							{submitError}
-						</Typography>
-					)}
-				</DialogActions>
-				<DialogActions>
-					{submitError && (
-						<Typography
-							variant="subtitle2"
 							align="left"
 							color="error"
 							paragraph
