@@ -14,6 +14,8 @@ import {
 import TaskGrid from '../components/TaskGrid';
 import CategoryGrid from '../components/CategoryGrid';
 import { Search } from '../components/Search';
+import { statuses } from '../components/TaskStatus';
+import StatusFilter from '../components/StatusFilter';
 
 const Home = () => {
 	usePageTitle('Home');
@@ -22,6 +24,7 @@ const Home = () => {
 	const [tasks, setTasks] = useState<Task[]>([]);
 	const [categories, setCategories] = useState<Category[]>([]);
 	const [inputValue, setInputValue] = useState('');
+	const [activeFilter, setActiveFilter] = useState('');
 	const user = useLoggedInUser();
 
 	useEffect(
@@ -53,6 +56,20 @@ const Home = () => {
 						<Tab label="Categories" value="2" />
 					</TabList>
 				</Box>
+				{tabValue === '1' &&
+					statuses.map((status, index) => (
+						<StatusFilter
+							key={index}
+							title={status}
+							isActive={status === activeFilter}
+							onClick={(e: React.MouseEvent) => {
+								const el = e.target as HTMLElement;
+								el.textContent === activeFilter
+									? setActiveFilter('')
+									: setActiveFilter(status);
+							}}
+						/>
+					))}
 				<Search
 					onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
 						setInputValue(e.target.value);
@@ -60,9 +77,11 @@ const Home = () => {
 				/>
 				<TabPanel value="1">
 					<TaskGrid
-						tasks={tasks.filter(el =>
-							el.name.toLowerCase().includes(inputValue.toLowerCase())
-						)}
+						tasks={tasks
+							.filter(el =>
+								el.name.toLowerCase().includes(inputValue.toLowerCase())
+							)
+							.filter(e => e.status.includes(activeFilter))}
 					/>
 				</TabPanel>
 				<TabPanel value="2">
