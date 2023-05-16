@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useContext, useEffect, useState } from 'react';
 import { onSnapshot } from 'firebase/firestore';
 import { Box, Button, Tab } from '@mui/material';
 import { TabContext, TabList, TabPanel } from '@mui/lab';
@@ -7,8 +7,6 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { Dayjs } from 'dayjs';
 
-import { ReactComponent as FilterIcon } from '../assets/filter.svg';
-import useLoggedInUser from '../hooks/useLoggedInUser';
 import usePageTitle from '../hooks/usePageTitle';
 import {
 	Category,
@@ -22,6 +20,8 @@ import { Search } from '../components/Search';
 import { statuses } from '../components/TaskStatus';
 import StatusFilter from '../components/StatusFilter';
 import 'dayjs/locale/en-gb';
+import { ModeContext } from '../hooks/Context';
+import { FilterIcon } from '../assets/Icons';
 
 const Home = () => {
 	usePageTitle('Home');
@@ -34,9 +34,7 @@ const Home = () => {
 	const [fromFilter, setFromFilter] = useState<Dayjs | null>(null);
 	const [toFilter, setToFilter] = useState<Dayjs | null>(null);
 	const [isFilter, setIsFilter] = useState(false);
-	const user = useLoggedInUser();
-
-	console.log('filter: ', toFilter?.toDate());
+	const { mode } = useContext(ModeContext);
 
 	useEffect(
 		() =>
@@ -54,7 +52,7 @@ const Home = () => {
 		[]
 	);
 
-	const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
+	const handleTabChange = (_event: React.SyntheticEvent, newValue: string) => {
 		setTabValue(newValue);
 	};
 
@@ -127,7 +125,7 @@ const Home = () => {
 					<Button
 						sx={{ bgcolor: isFilter ? '#8c1aff' : '' }}
 						disabled={!isFilter}
-						onClick={e => {
+						onClick={_e => {
 							setActiveFilter('');
 							setFromFilter(null);
 							setToFilter(null);
@@ -135,7 +133,10 @@ const Home = () => {
 							setIsFilter(false);
 						}}
 					>
-						<FilterIcon className="w-4 sm:w-5 h-min" />
+						<FilterIcon
+							className="w-4 sm:w-5 h-min"
+							stroke={mode === 'light' ? '#000000' : '#FFFFFF'}
+						/>
 					</Button>
 				</div>
 

@@ -6,12 +6,12 @@ import {
 	MenuItem,
 	Select
 } from '@mui/material';
-import { FC, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren, useContext } from 'react';
 import { updateDoc } from 'firebase/firestore';
 
 import { Task, tasksDocument } from '../firebase';
-import { ReactComponent as Calendar } from '../assets/calendar.svg';
-import { ReactComponent as Time } from '../assets/time.svg';
+import { ModeContext } from '../hooks/Context';
+import { CalendarIcon, TimeIcon } from '../assets/Icons';
 
 import { Status, statuses } from './TaskStatus';
 import CalculateDuration from './CalculateDuration';
@@ -28,6 +28,7 @@ const TaskPreview: FC<Props> = ({ task, onClick }) => {
 		});
 	};
 	const { calcDuration, calcUnit } = CalculateDuration(task.duration, true);
+	const { mode } = useContext(ModeContext);
 
 	return (
 		<Grid item xs={2} sm={4} md={4} lg={4}>
@@ -56,13 +57,19 @@ const TaskPreview: FC<Props> = ({ task, onClick }) => {
 					{task.description !== '' ? task.description : 'empty'}
 				</p>
 				<time className="p-3 sm:p-4 flex text-left">
-					<Calendar className="mr-2 w-4 sm:w-5 h-min" />{' '}
+					<CalendarIcon
+						className="mr-2 w-4 sm:w-5 h-min"
+						fill={mode === 'light' ? '#000000' : '#FFFFFF'}
+					/>{' '}
 					{task.deadline.toDate().getDate().toString().padStart(2, '0')}/
 					{(task.deadline.toDate().getMonth() + 1).toString().padStart(2, '0')}/
 					{task.deadline.toDate().getFullYear()}
 				</time>
 				<p className="flex">
-					<Time className="mr-2 w-4 sm:w-5 h-min" />
+					<TimeIcon
+						className="mr-2 w-4 sm:w-5 h-min"
+						stroke={mode === 'light' ? '#000000' : '#FFFFFF'}
+					/>
 					{calcDuration}
 					{calcUnit}
 				</p>

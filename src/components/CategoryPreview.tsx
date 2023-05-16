@@ -1,8 +1,9 @@
 import { Button, Grid } from '@mui/material';
-import { FC, PropsWithChildren } from 'react';
+import { FC, PropsWithChildren, useContext } from 'react';
 
 import { Category } from '../firebase';
-import { ReactComponent as Time } from '../assets/time.svg';
+import { ModeContext } from '../hooks/Context';
+import { TimeIcon } from '../assets/Icons';
 
 import CalculateDuration from './CalculateDuration';
 
@@ -13,6 +14,7 @@ type Props = PropsWithChildren<{
 
 const CategoryPreview: FC<Props> = ({ category, onClick }) => {
 	const { calcDuration, calcUnit } = CalculateDuration(category.duration, true);
+	const { mode } = useContext(ModeContext);
 	return (
 		<Grid item xs={2} sm={4} md={4} lg={4}>
 			<Button
@@ -33,7 +35,10 @@ const CategoryPreview: FC<Props> = ({ category, onClick }) => {
 					</span>
 				</div>
 				<p className="flex">
-					<Time className="mr-2 w-4 sm:w-5 h-min" />
+					<TimeIcon
+						className="mr-2 w-4 sm:w-5 h-min"
+						stroke={mode === 'light' ? '#000000' : '#FFFFFF'}
+					/>
 					{calcDuration}
 					{calcUnit}
 				</p>
