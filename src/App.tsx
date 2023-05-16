@@ -6,7 +6,6 @@ import {
 	CssBaseline,
 	FormControlLabel,
 	FormGroup,
-	PaletteMode,
 	Switch,
 	ThemeProvider,
 	Toolbar,
@@ -20,7 +19,7 @@ import {
 	Router,
 	RouterProvider
 } from '@tanstack/react-router';
-import { useMemo, useState } from 'react';
+import { useContext, useMemo } from 'react';
 
 import { signOut } from './firebase';
 import ButtonLink from './components/ButtonLink';
@@ -31,15 +30,16 @@ import Login from './pages/Login';
 import NotFound from './pages/NotFound';
 import useLoggedInUser, { UserProvider } from './hooks/useLoggedInUser';
 import getPalleteValues from './theme/getPalleteOptions';
+import { ModeContext } from './hooks/Context';
 
 const rootRoute = new RootRoute({
 	component: () => {
 		const user = useLoggedInUser();
 
-		const [mode, setMode] = useState<PaletteMode>('light');
+		const { mode, toggleMode } = useContext(ModeContext);
 
 		const toggleColorMode = () => {
-			setMode(prevMode => (prevMode === 'light' ? 'dark' : 'light'));
+			toggleMode();
 		};
 
 		// Update the theme only if the mode changes
