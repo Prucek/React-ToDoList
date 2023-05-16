@@ -72,11 +72,10 @@ const Home = () => {
 							title={status}
 							isActive={status === activeFilter}
 							onClick={(e: React.MouseEvent) => {
-								setIsFilter(prev => !prev);
 								const el = e.target as HTMLElement;
 								el.textContent === activeFilter
-									? setActiveFilter('')
-									: setActiveFilter(status);
+									? (setActiveFilter(''), setIsFilter(false))
+									: (setActiveFilter(status), setIsFilter(true));
 							}}
 						/>
 					))}
