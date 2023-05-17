@@ -1,5 +1,5 @@
 import { ReactNode, SetStateAction, useEffect, useState } from 'react';
-import { deleteDoc, setDoc, updateDoc } from 'firebase/firestore';
+import { deleteDoc, getDocs, setDoc, updateDoc } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 import { CirclePicker } from 'react-color';
 import {
@@ -20,7 +20,12 @@ import 'dayjs/locale/en-gb';
 import { Delete } from '@mui/icons-material';
 
 import useLoggedInUser from '../hooks/useLoggedInUser';
-import { Category, categoriesDocument } from '../firebase';
+import {
+	Category,
+	categoriesDocument,
+	tasksCollection,
+	tasksDocument
+} from '../firebase';
 
 import CalculateDuration from './CalculateDuration';
 
@@ -80,6 +85,19 @@ const AddCategory = ({ children, category }: Props) => {
 					duration:
 						duration * (unit === 'mins' ? 1 : unit === 'hours' ? 60 : 60 * 24),
 					color
+				});
+
+				// update tasks color with edited category..duration remains same in task, not using defualt
+				const snapshot = await getDocs(tasksCollection);
+				const allTasks = snapshot.docs.map(doc => doc.data());
+
+				allTasks.forEach(async task => {
+					if (task.category === category.name && task.email === user.email) {
+						await updateDoc(tasksDocument(task.id), {
+							category: name,
+							color
+						});
+					}
 				});
 			} else {
 				const id = uuidv4();
