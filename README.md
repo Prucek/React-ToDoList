@@ -3,6 +3,8 @@
 **Repository url:** (https://github.com/Prucek/React-ToDoList) <br />
 **Deploy url:** <url> <br />
 **Seminar group:** 01 <br />
+  
+ Exampe user: user1@user.com pass: somuser1
 
 ```md
 # TODO List
